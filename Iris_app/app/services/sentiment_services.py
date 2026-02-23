@@ -6,7 +6,10 @@ from app.utils.exceptions import SentinmentPiplineError, PredictionError
 logging = get_logger(__name__)
 
 try:
-    sentiment_pipeline = pipeline("sentiment-analysis")
+    sentiment_pipeline = pipeline(
+        "sentiment-analysis",
+        model="distilbert-base-uncased-finetuned-sst-2-english"
+    )
 except Exception as e:
     logging.error(f"Failed to load sentiment analysis pipeline: {e}")
     sentiment_pipeline = None
@@ -17,18 +20,14 @@ def preprocess_input(text: str) -> str:
     Preprocess the input text for sentiment analysis.
     This can include lowercasing, removing special characters, etc.
     """
-    # Example preprocessing: lowercasing and stripping whitespace
     text = text.lower().strip()
-    # remove special characters if needed
     text = re.sub(r'[^\w\s]', '', text)
-    #remove more special characters
     text = re.sub(r'\s+', ' ', text)
-    #remove https links
     text = re.sub(r'http\S+|www\S+|https\S+', '', text)
     return text
 
 
-def predict_sentiment(text:str) -> dict:
+def predict_sentiment(text: str) -> dict:
     """
     Predict the sentiment of the input text.
     :param text: The input text to analyze.
